@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      h1 {
+        font-size: 3rem;
+        color: darkcyan;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Hello World</h1>
+    <button>Click Me</button>
+  </body>
+  <script>
+    const button = document.querySelector('button');
+    button.addEventListener('click', () => {
+      alert('This is what Javascript does!');
+    });
+  </script>
+</html>
