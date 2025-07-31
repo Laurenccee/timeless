@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { Memory } from '@/types/memory';
 import { supabase } from '@/lib/supabase';
 import { generateDateRange, DateEntry } from '@/utils/date-utils';
-import Image from 'next/image';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   Tooltip,

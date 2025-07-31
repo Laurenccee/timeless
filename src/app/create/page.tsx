@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import {
   Carousel,
   CarouselContent,
@@ -95,8 +96,12 @@ export default function CreateMemory() {
       if (error) throw error;
 
       router.push('/');
-    } catch (err: any) {
-      alert(err.message || 'Upload failed');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        alert(err.message);
+      } else {
+        console.error('Unexpected error:', err);
+      }
     } finally {
       setLoading(false);
     }
@@ -156,9 +161,12 @@ export default function CreateMemory() {
                   {files.map((file, index) => (
                     <CarouselItem key={index}>
                       <div className="relative">
-                        <img
+                        <Image
                           src={URL.createObjectURL(file)}
                           alt={`preview-${index}`}
+                          width={600}
+                          height={600}
+                          priority={true}
                           className="object-contain max-h-[600px] w-full rounded-md"
                         />
                         <button

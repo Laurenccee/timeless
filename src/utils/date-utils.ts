@@ -7,7 +7,7 @@ export interface DateEntry {
 
 export function generateDateRange(start: string, end: string): DateEntry[] {
   const dateArray: DateEntry[] = [];
-  let current = new Date(start);
+  const current = new Date(start);
   const last = new Date(end);
 
   while (current <= last) {
