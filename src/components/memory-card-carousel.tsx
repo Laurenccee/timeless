@@ -38,9 +38,9 @@ export default function MemoryCarousel({ images, title }: Props) {
   if (!images.length) return null;
 
   return (
-    <Card className="w-full h-full">
+    <Card className="w-full h-full overflow-hidden bg-white rounded-2xl">
       <CardContent
-        className="relative aspect-[4/3] p-0 overflow-hidden"
+        className="relative aspect-[4/3] p-0 overflow-hidden group"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -51,6 +51,7 @@ export default function MemoryCarousel({ images, title }: Props) {
           fill
           className="object-cover"
           sizes="(max-width: 768px) 100vw, 50vw"
+          priority
         />
         {images.length > 1 && (
           <>
@@ -58,21 +59,21 @@ export default function MemoryCarousel({ images, title }: Props) {
               variant="ghost"
               size="icon"
               onClick={prev}
-              className="absolute top-1/2 left-2 -translate-y-1/2 bg-white/20 hover:bg-white rounded-full"
+              className="absolute top-1/2 left-3 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
             >
-              <ChevronLeft />
+              <ChevronLeft className="text-[#5F6368]" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
               onClick={next}
-              className="absolute top-1/2 right-2 -translate-y-1/2 bg-white/20 hover:bg-white rounded-full"
+              className="absolute top-1/2 right-3 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
             >
-              <ChevronRight />
+              <ChevronRight className="text-[#5F6368]" />
             </Button>
           </>
         )}
-        <div className="absolute bottom-2 right-2 bg-black/50 text-white text-xs px-2 py-0.5 rounded">
+        <div className="absolute bottom-3 right-3 bg-[#6B9EE8] text-white text-xs font-medium px-3 py-1.5 rounded-full">
           {index + 1} / {images.length}
         </div>
       </CardContent>

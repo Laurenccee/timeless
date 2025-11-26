@@ -16,7 +16,8 @@ import {
   Trash2,
 } from 'lucide-react';
 import { CarouselApi } from '@/components/ui/carousel';
-import { supabase } from '@/lib/supabase';
+import { db } from '@/lib/firebase';
+import { collection, addDoc } from 'firebase/firestore';
 import { DatePicker } from '@/components/date-picker';
 
 export default function CreateMemory() {
@@ -65,6 +66,7 @@ export default function CreateMemory() {
     try {
       const imageUrls: string[] = [];
 
+      // Upload images to Cloudinary
       for (const file of files) {
         const formData = new FormData();
         formData.append('file', file);
@@ -84,16 +86,14 @@ export default function CreateMemory() {
         imageUrls.push(data.secure_url);
       }
 
-      const { error } = await supabase.from('memories').insert([
-        {
-          title,
-          description,
-          image_urls: imageUrls,
-          memory_date: memoryDate,
-        },
-      ]);
-
-      if (error) throw error;
+      // Save memory data to Firestore
+      await addDoc(collection(db, 'memories'), {
+        title,
+        description,
+        image_urls: imageUrls,
+        memory_date: memoryDate,
+        created_at: new Date().toISOString(),
+      });
 
       router.push('/');
     } catch (err: unknown) {
@@ -108,19 +108,19 @@ export default function CreateMemory() {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-white">
-      <div className="w-full max-w-6xl bg-white rounded-lg shadow-xl overflow-hidden border border-gray-200 relative">
+    <div className="flex justify-center items-center min-h-screen bg-[#F7F9FC] md:ml-16">
+      <div className="w-full max-w-6xl bg-white rounded-2xl overflow-hidden relative my-8 mx-4">
         {/* Back button */}
         <button
           onClick={() => router.back()}
-          className="absolute top-4 left-4 z-10 bg-gray-100 text-gray-700 hover:bg-gray-200 p-2 rounded-full"
+          className="absolute top-4 left-4 z-10 bg-white hover:bg-[#E8F0FC] p-2 sm:p-3 rounded-full transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
           aria-label="Back"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-[#5F6368]" />
         </button>
 
-        <div className="px-8 py-5 border-b border-gray-200 text-black text-center font-semibold text-2xl">
-          Create new post
+        <div className="px-8 py-6 border-b border-[#E8F0FC] text-[#1F1F1F] text-center font-semibold text-2xl">
+          Create new memory
         </div>
 
         {files.length === 0 ? (
@@ -129,15 +129,15 @@ export default function CreateMemory() {
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
-            className={`flex flex-col items-center justify-center p-16 text-gray-700 transition border-2 border-dashed rounded-md ${
-              isDragging ? 'border-blue-400 bg-blue-50' : 'border-gray-300'
+            className={`flex flex-col items-center justify-center p-16 text-[#5F6368] transition border-2 border-dashed rounded-2xl m-8 ${
+              isDragging ? 'border-[#6B9EE8] bg-[#E8F0FC]' : 'border-[#DDE5EF]'
             }`}
           >
-            <ImagePlus className="w-20 h-20 text-gray-400 mb-4" />
-            <p className="mb-4 text-lg">
+            <ImagePlus className="w-20 h-20 text-[#B8D4F1] mb-4" />
+            <p className="mb-4 text-lg font-medium">
               Drag and drop photos here or select from computer
             </p>
-            <label className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded cursor-pointer">
+            <label className="inline-block bg-[#6B9EE8] hover:bg-[#5A8DD6] text-white font-medium px-6 py-3 rounded-full cursor-pointer transition-colors">
               Select from computer
               <input
                 type="file"
@@ -151,7 +151,7 @@ export default function CreateMemory() {
         ) : (
           <div className="flex flex-col lg:flex-row">
             {/* Carousel Section */}
-            <div className="relative flex-1 flex items-center justify-center bg-gray-100">
+            <div className="relative flex-1 flex items-center justify-center bg-[#F7F9FC]">
               <Carousel
                 className="w-full max-w-3xl p-8"
                 opts={{ loop: true }}
@@ -175,10 +175,10 @@ export default function CreateMemory() {
                               prev.filter((_, i) => i !== index)
                             )
                           }
-                          className="absolute top-2 right-2 text-red rounded-full w-7 h-7 flex items-center justify-center text-xs"
+                          className="absolute top-2 right-2 bg-white/90 hover:bg-white p-2 rounded-full transition-colors"
                           aria-label="Remove image"
                         >
-                          <Trash2 />
+                          <Trash2 className="w-4 h-4 text-red-500" />
                         </button>
                       </div>
                     </CarouselItem>
@@ -186,9 +186,9 @@ export default function CreateMemory() {
                   {/* Add New Image Card */}
                   <CarouselItem>
                     <div className="h-full flex items-center justify-center">
-                      <label className="flex flex-col items-center justify-center w-40 h-40 border-2 border-dashed border-gray-300 text-gray-500 hover:border-blue-400 hover:text-blue-600 rounded-lg cursor-pointer">
+                      <label className="flex flex-col items-center justify-center w-40 h-40 border-2 border-dashed border-[#DDE5EF] text-[#5F6368] hover:border-[#6B9EE8] hover:text-[#6B9EE8] rounded-2xl cursor-pointer transition-colors">
                         <ImagePlus className="w-8 h-8 mb-1" />
-                        <span className="text-sm">Add photo</span>
+                        <span className="text-sm font-medium">Add photo</span>
                         <input
                           type="file"
                           accept="image/*"
@@ -215,36 +215,36 @@ export default function CreateMemory() {
 
               {/* Nav Buttons */}
               <button
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white border border-gray-300 shadow p-2 rounded-full hover:bg-blue-50"
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white hover:bg-[#E8F0FC] p-3 rounded-full transition-colors opacity-40 hover:opacity-100"
                 onClick={() => carouselApi?.scrollPrev()}
                 aria-label="Previous"
               >
-                <ChevronLeft className="w-5 h-5 text-gray-700" />
+                <ChevronLeft className="w-5 h-5 text-[#5F6368]" />
               </button>
               <button
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white border border-gray-300 shadow p-2 rounded-full hover:bg-blue-50"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white hover:bg-[#E8F0FC] p-3 rounded-full transition-colors opacity-40 hover:opacity-100"
                 onClick={() => carouselApi?.scrollNext()}
                 aria-label="Next"
               >
-                <ChevronRight className="w-5 h-5 text-gray-700" />
+                <ChevronRight className="w-5 h-5 text-[#5F6368]" />
               </button>
             </div>
 
             {/* Form Section */}
-            <div className="w-full lg:w-[400px] p-6 border-t lg:border-t-0 lg:border-l border-gray-200 flex flex-col gap-4 bg-white">
+            <div className="w-full lg:w-[400px] p-6 border-t lg:border-t-0 lg:border-l border-[#E8F0FC] flex flex-col gap-4 bg-white">
               <textarea
                 placeholder="Write a caption..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={5}
-                className="w-full border border-gray-300 rounded-lg p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-[#DDE5EF] rounded-2xl p-3 text-sm resize-none focus:outline-none focus:border-[#6B9EE8] transition-colors"
               />
               <input
                 type="text"
                 placeholder="Title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-[#DDE5EF] rounded-2xl p-3 text-sm focus:outline-none focus:border-[#6B9EE8] transition-colors"
               />
               <DatePicker
                 memoryDate={memoryDate}
@@ -253,7 +253,7 @@ export default function CreateMemory() {
               <button
                 onClick={handleUpload}
                 disabled={loading}
-                className="bg-blue-600 text-white font-medium px-4 py-3 rounded hover:bg-blue-700 transition mt-auto"
+                className="bg-[#6B9EE8] text-white font-medium px-4 py-3 rounded-full hover:bg-[#5A8DD6] transition-colors mt-auto disabled:opacity-50"
               >
                 {loading ? 'Uploading...' : 'Share'}
               </button>
